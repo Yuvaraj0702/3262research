@@ -63,36 +63,16 @@ To run the code:
    ```
 
 ## Initialization
+How the code set up objects and models before commencing training:
 1. **Prepare Market Data:** Fetch historical data using `yfinance` or load a dataset with OHLCV information.
 2. **Initialize Environment:** Set up `TradingEnvironment` with the required parameters like initial cash, trade size, and data.
 3. **Initialize DRQN Agent:** Use the `DRQN` class by providing state size, action size, learning rate, etc.
 
-Example:
-```python
-# Load data and initialize environment and agent
-data = yf.download("AAPL", start="2020-01-01", end="2023-01-01")
-env = TradingEnvironment(data)
-state_size = env.observation_space.shape[0]
-action_size = env.action_space.n
-agent = DRQN(state_size, action_size)
-```
 
 ## Training
-To train the agent:
+How the agent is trained:
 1. Gather a set of episodes where the agent interacts with the `TradingEnvironment`.
 2. Save experience tuples and use them in batches for training with the `train_on_batch` method in `DRQN`.
-
-```python
-# Training loop (simplified)
-for episode in range(total_episodes):
-    state = env.reset()
-    done = False
-    while not done:
-        action = agent.predict(state)
-        next_state, reward, done, _ = env.step(action)
-        agent.train_on_batch([(state, action, reward, next_state, done)], discount_factor)
-        state = next_state
-```
 
 ## Environment
 ### `TradingEnvironment`
