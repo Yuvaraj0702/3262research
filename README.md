@@ -1,15 +1,25 @@
-# Deep Recurrent Q-Network (DRQN) for Financial Data Analysis
 
-This project implements a Deep Recurrent Q-Network (DRQN) to analyze financial data, specifically focusing on stock trading strategies using historical price data. The model employs reinforcement learning techniques to learn optimal trading actions based on market conditions.
+# DRQN-based Trading System
+
+This project implements a **Deep Recurrent Q-Network (DRQN)** for training a trading agent in a custom-built environment using historical stock market data. The DRQN model leverages LSTMs to handle sequential dependencies, making it suitable for time series tasks like trading.
 
 ## Table of Contents
+- [Introduction](#introduction)
 - [Installation](#installation)
 - [Dependencies](#dependencies)
+- [Features](#features)
 - [Usage](#usage)
+- [Initialization](#initialization)
 - [Training](#training)
-- [Testing](#testing)
-- [Logging](#logging)
+- [Environment](#environment)
+- [Model Architecture](#model-architecture)
+- [Customization](#customization)
 - [License](#license)
+
+## Introduction
+This code defines:
+1. A **DRQN class** for training a trading agent with LSTM layers, designed to capture temporal dependencies.
+2. A custom **TradingEnvironment** class that simulates market trading, with reward based on portfolio value changes and various transaction costs.
 
 ## Installation
 
@@ -22,49 +32,102 @@ To set up the environment and run the DRQN model, follow these steps:
    ```
 
 ## Dependencies
-
-This project requires the following Python packages:
-
-- `numpy`
-- `pandas`
-- `gym`
-- `yfinance`
-- `tensorflow`
-- `logging`
-
-You can install them using pip:
-```bash
-pip install numpy pandas gym yfinance tensorflow
+To use this project, you will need the following Python packages:
+```python
+numpy
+pandas
+tensorflow
+gymnasium
+yfinance
+matplotlib
+logging
 ```
+
+To install dependencies:
+```bash
+pip install numpy pandas tensorflow gymnasium yfinance matplotlib
+```
+
+## Features
+- **DRQN model** with LSTM-based architecture, using He Normal initialization and customized weight settings.
+- **Trading Environment** in OpenAI Gym format, with features including:
+  - Dynamic position updates.
+  - Sinusoidal encoding of the day of the week for time awareness.
+  - Customizable transaction costs and reward structure.
+
 
 ## Usage
+To run the code: 
+  ```bash
+   python project.py
+   ```
 
-To run the DRQN model, execute the `project.py` script:
+## Initialization
+1. **Prepare Market Data:** Fetch historical data using `yfinance` or load a dataset with OHLCV information.
+2. **Initialize Environment:** Set up `TradingEnvironment` with the required parameters like initial cash, trade size, and data.
+3. **Initialize DRQN Agent:** Use the `DRQN` class by providing state size, action size, learning rate, etc.
 
-```bash
-python project.py
+Example:
+```python
+# Load data and initialize environment and agent
+data = yf.download("AAPL", start="2020-01-01", end="2023-01-01")
+env = TradingEnvironment(data)
+state_size = env.observation_space.shape[0]
+action_size = env.action_space.n
+agent = DRQN(state_size, action_size)
 ```
 
-The script will automatically download historical stock price data (default: Apple Inc. - AAPL) and perform training and testing of the DRQN model.
+## Training
+To train the agent:
+1. Gather a set of episodes where the agent interacts with the `TradingEnvironment`.
+2. Save experience tuples and use them in batches for training with the `train_on_batch` method in `DRQN`.
 
-### Training
+```python
+# Training loop (simplified)
+for episode in range(total_episodes):
+    state = env.reset()
+    done = False
+    while not done:
+        action = agent.predict(state)
+        next_state, reward, done, _ = env.step(action)
+        agent.train_on_batch([(state, action, reward, next_state, done)], discount_factor)
+        state = next_state
+```
 
-The model will train on historical stock data, learning to make decisions (Buy, Sell, Hold) based on market trends. The training process includes:
+## Environment
+### `TradingEnvironment`
+A custom trading environment that:
+- Observes an agent's action to **Buy**, **Sell**, or **Hold**.
+- Computes transaction costs, rewards based on portfolio returns.
+- Includes sinusoidal encoding for day-of-the-week to account for temporal cycles.
 
-- A reduced number of training episodes for faster convergence.
-- Experience replay to enhance learning stability.
+### Observation Space
+The state includes market data features and additional position indicators:
+- `[OHLCV, Position, Day Encoding]`
 
-### Testing
+### Action Space
+Actions:
+- `0` - Sell
+- `1` - Hold
+- `2` - Buy
 
-After training, the model will be tested over a set number of episodes. The test results will include the total profit/loss for each episode, which will be logged for review.
+## Model Architecture
+The DRQN model consists of:
+- Two dense layers with ELU activations.
+- An LSTM layer with identity initialization for recurrent kernel and He Normal for kernel.
+- Output layer for Q-values with a linear activation.
 
-## Logging
+```plaintext
+Input -> Dense(256, ELU) -> Dense(256, ELU) -> LSTM(256) -> Dense(action_size, Linear)
+```
 
-The application uses Python's built-in logging module to provide real-time insights into the training and testing processes. The log will detail:
+## Customization
+### Hyperparameters
+- Adjust `learning_rate`, `tau`, and layer dimensions in the DRQN model.
+- Modify transaction costs in `TradingEnvironment`.
 
-- Episode start and completion.
-- Actions taken during testing.
-- Total rewards for each episode.
+### Environment
+The environment is built to be flexible and can be adjusted for different financial instruments, trade sizes, and portfolio configurations.
 
-You can adjust the logging level in the code to show more or less detail.
-
+## License
+This project is licensed under the MIT License.
