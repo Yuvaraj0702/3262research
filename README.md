@@ -14,6 +14,7 @@ This project implements a **Deep Recurrent Q-Network (DRQN)** for training a tra
 - [Environment](#environment)
 - [Model Architecture](#model-architecture)
 - [Customization](#customization)
+- [Ensemble replication](#ensemble-replication)
 - [License](#license)
 
 ## Introduction
@@ -109,7 +110,7 @@ Input -> Dense(256, ELU) -> Dense(256, ELU) -> LSTM(256) -> Dense(action_size, L
 ### Environment
 The environment is built to be flexible and can be adjusted for different financial instruments, trade sizes, and portfolio configurations.
 
-## Ensemble replication:
+## Ensemble replication
 Run the file Ensemble_replication.ipynb on jupyterhub to see the results of the ensembling model.
 
 ## License
