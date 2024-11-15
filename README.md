@@ -59,7 +59,7 @@ pip install numpy pandas tensorflow gymnasium yfinance matplotlib
 ## Usage
 To run the code: 
   ```bash
-   python project.py
+   python DRQN_replication.py
    ```
 
 ## Initialization
@@ -108,6 +108,9 @@ Input -> Dense(256, ELU) -> Dense(256, ELU) -> LSTM(256) -> Dense(action_size, L
 
 ### Environment
 The environment is built to be flexible and can be adjusted for different financial instruments, trade sizes, and portfolio configurations.
+
+## Ensemble replication:
+Run the file Ensemble_replication.ipynb on jupyterhub to see the results of the ensembling model.
 
 ## License
 This project is licensed under the MIT License.
